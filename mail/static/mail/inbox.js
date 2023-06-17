@@ -31,9 +31,9 @@ document.addEventListener( 'DOMContentLoaded', function ()
         // Print result
         console.log( result );
 
+        load_mailbox( 'sent' );
       } );
 
-    load_mailbox( 'sent' );
 
   } );
 
@@ -75,7 +75,7 @@ function load_mailbox ( mailbox )
       {
 
         //destructuring
-        const { sender, subject, timestamp, read, id, recipients } = email;
+        const { sender, subject, timestamp, read, id } = email;
 
         //add classes
         const element = document.createElement( 'div' );
@@ -119,7 +119,7 @@ function load_mailbox ( mailbox )
               //create the archive button
               const archiveButton = document.createElement( 'button' );
               archiveButton.classList.add( 'btn', 'btn-outline-primary', 'mb-3' );
-              archiveButton.textContent = 'Archive';
+              archiveButton.textContent = !archived ? 'Archive' : 'Unarchive';
               archiveButton.addEventListener( 'click', () =>
               {
                 //update archive status true/false false/true
@@ -128,8 +128,8 @@ function load_mailbox ( mailbox )
                   body: JSON.stringify( {
                     archived: !archived,
                   } )
-                } );
-                load_mailbox( 'inbox' );
+                } )
+                  .then( () => load_mailbox( 'inbox' ) );
               } );
 
 
@@ -170,10 +170,12 @@ function load_mailbox ( mailbox )
                 </div>
               `;
 
-              //add archive button to div with class border-bottom
-              singleEmailContainer.querySelector( '.card-body' ).append( archiveButton );
+              //add archive button to div with class border-bottom if not in sent mailbox
+              mailbox !== 'sent' && singleEmailContainer.querySelector( '.card-body' ).append( archiveButton );
 
-              //add reply button to div with class border-bottom
+              console.log( recipients );
+
+              //add reply button to div with class border-bottom in inbox for not replaying to onself
               singleEmailContainer.querySelector( '.border-bottom' ).append( replyButton );
 
               //update read status to false
@@ -183,17 +185,11 @@ function load_mailbox ( mailbox )
                   read: true
                 } )
               } );
-
-
-
-
             } );
         } );
         //appending to the div
         document.querySelector( '#emails-view' ).append( element );
-
       } );
-
     } );
 
 }
