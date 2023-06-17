@@ -32,7 +32,6 @@ document.addEventListener( 'DOMContentLoaded', function ()
         console.log( result );
 
       } );
-    console.log( { recipients, subject, body } );
 
     load_mailbox( 'sent' );
 
@@ -48,6 +47,7 @@ function compose_email ()
   // Show compose view and hide other views
   document.querySelector( '#emails-view' ).style.display = 'none';
   document.querySelector( '#compose-view' ).style.display = 'block';
+  document.querySelector( '#single-email-container' ).style.display = 'none';
 
   // Clear out composition fields
   document.querySelector( '#compose-recipients' ).value = '';
@@ -61,6 +61,7 @@ function load_mailbox ( mailbox )
   // Show the mailbox and hide other views
   document.querySelector( '#emails-view' ).style.display = 'block';
   document.querySelector( '#compose-view' ).style.display = 'none';
+  document.querySelector( '#single-email-container' ).style.display = 'none';
 
   // Show the mailbox name
   document.querySelector( '#emails-view' ).innerHTML = `<h3>${ mailbox.charAt( 0 ).toUpperCase() + mailbox.slice( 1 ) }</h3>`;
@@ -72,8 +73,9 @@ function load_mailbox ( mailbox )
     {
       emails.forEach( email =>
       {
+
         //destructuring
-        const { sender, subject, timestamp, read } = email;
+        const { sender, subject, timestamp, read, id } = email;
 
         //add classes
         const element = document.createElement( 'div' );
@@ -98,8 +100,36 @@ function load_mailbox ( mailbox )
         //checking if divs is clicked
         element.addEventListener( 'click', () =>
         {
-          console.log( 'This element has been clicked!', read );
+          fetch( `/emails/${ id }` )
+            .then( response => response.json() )
+            .then( email =>
+            {
+              // Print email
+              console.log( email );
 
+              // ... do something else with email ...
+              const { sender, recipients, subject, timestamp, body } = email;
+
+              document.querySelector( '#emails-view' ).style.display = 'none';
+              document.querySelector( '#compose-view' ).style.display = 'none';
+              document.querySelector( '#single-email-container' ).style.display = 'block';
+
+              const singleEmailContainer = document.querySelector( '#single-email-container' );
+
+              // Update the innerHTML of the #single-email-container element
+              singleEmailContainer.innerHTML = `
+                <div class="card-body">
+                  <div class="border-bottom mb-2">
+                    <p class="card-title">From: ${ sender }</p>
+                    <p class="card-subtitle mb-2 text-muted">To: ${ recipients }</p>
+                    <p class="card-subtitle mb-2 text-muted">Subject: ${ subject }</p>
+                    <p class="card-text">Timestamp: ${ timestamp }</p>
+                  </div>
+                  <p class="card-text">${ body }</p>
+                </div>
+              `;
+
+            } );
         } );
         //appending to the div
         document.querySelector( '#emails-view' ).append( element );
