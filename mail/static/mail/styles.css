@@ -1,3 +1,6 @@
 textarea {
-    min-height: 400px;
+  min-height: 400px;
+}
+.sent-div:hover {
+  transform: scale(1.02);
 }

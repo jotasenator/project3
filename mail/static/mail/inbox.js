@@ -74,16 +74,29 @@ function load_mailbox ( mailbox )
 
       emails.forEach( email =>
       {
-        console.log( email );
-        const { sender, subject, timestamp } = email;
+        const { sender, subject, timestamp, read } = email;
+
         const element = document.createElement( 'div' );
-        element.innerHTML = sender + '/ ' + subject + '/' + timestamp;
+        element.classList.add( 'card-body' );
+        element.classList.add( 'sent-div' );
+
+        element.innerHTML = ` 
+          <h5 class="card-title">${ sender }</h5>
+          <h6 class="card-subtitle mb-2 text-muted">${ subject }</h6>
+          <p class="card-text">${ timestamp }</p>
+        `;
+
+        // styles
+        element.style.border = '5px solid white';
+        element.style.borderRadius = '15px';
+        element.style.boxShadow = '0 0 5px rgba(0, 0, 0, 0.5)';
+        element.style.marginBottom = '10px';
+
+        email.read ? element.style.backgroundColor = '#e9ecef' : element.style.backgroundColor = 'white';
 
         element.addEventListener( 'click', () =>
         {
-          console.log( 'This element has been clicked!', email.read );
-          email.read = false;
-          console.log( 'This element has been clicked!', email.read );
+          console.log( 'This element has been clicked!', read );
 
         } );
         document.querySelector( '#emails-view' ).append( element );
