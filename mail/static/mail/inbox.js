@@ -108,13 +108,31 @@ function load_mailbox ( mailbox )
               console.log( email );
 
               // ... do something else with email ...
-              const { sender, recipients, subject, timestamp, body } = email;
+              const { sender, recipients, subject, timestamp, body, archived } = email;
 
               document.querySelector( '#emails-view' ).style.display = 'none';
               document.querySelector( '#compose-view' ).style.display = 'none';
               document.querySelector( '#single-email-container' ).style.display = 'block';
 
               const singleEmailContainer = document.querySelector( '#single-email-container' );
+
+              //create the archive button
+              const archiveButton = document.createElement( 'button' );
+              archiveButton.classList.add( 'btn', 'btn-outline-primary', 'mb-3' );
+              archiveButton.textContent = 'Archive';
+              archiveButton.addEventListener( 'click', () =>
+              {
+                //update archive status true/false false/true
+                fetch( `/emails/${ id }`, {
+                  method: 'PUT',
+                  body: JSON.stringify( {
+                    archived: !archived,
+                  } )
+                } );
+                load_mailbox( 'inbox' );
+              } );
+
+
 
               //create the reply button
               const replyButton = document.createElement( 'button' );
@@ -151,6 +169,9 @@ function load_mailbox ( mailbox )
                   <p class="card-text">${ body }</p>
                 </div>
               `;
+
+              //add archive button to div with class border-bottom
+              singleEmailContainer.querySelector( '.card-body' ).append( archiveButton );
 
               //add reply button to div with class border-bottom
               singleEmailContainer.querySelector( '.border-bottom' ).append( replyButton );
