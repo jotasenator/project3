@@ -70,35 +70,38 @@ function load_mailbox ( mailbox )
     .then( response => response.json() )
     .then( emails =>
     {
-      console.table( emails );
-
       emails.forEach( email =>
       {
+        //destructuring
         const { sender, subject, timestamp, read } = email;
 
+        //add classes
         const element = document.createElement( 'div' );
-        element.classList.add( 'card-body' );
-        element.classList.add( 'sent-div' );
+        element.classList.add( 'card-body', 'sent-div' );
 
+        //format cards
         element.innerHTML = ` 
           <h5 class="card-title">${ sender }</h5>
           <h6 class="card-subtitle mb-2 text-muted">${ subject }</h6>
           <p class="card-text">${ timestamp }</p>
         `;
 
-        // styles
+        // styles in other diff way
         element.style.border = '5px solid white';
         element.style.borderRadius = '15px';
         element.style.boxShadow = '0 0 5px rgba(0, 0, 0, 0.5)';
         element.style.marginBottom = '10px';
 
-        email.read ? element.style.backgroundColor = '#e9ecef' : element.style.backgroundColor = 'white';
+        //conditional background
+        read ? element.style.backgroundColor = '#e9ecef' : element.style.backgroundColor = 'white';
 
+        //checking if divs is clicked
         element.addEventListener( 'click', () =>
         {
           console.log( 'This element has been clicked!', read );
 
         } );
+        //appending to the div
         document.querySelector( '#emails-view' ).append( element );
 
       } );
