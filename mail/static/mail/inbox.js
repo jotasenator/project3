@@ -75,7 +75,7 @@ function load_mailbox ( mailbox )
       {
 
         //destructuring
-        const { sender, subject, timestamp, read, id } = email;
+        const { sender, subject, timestamp, read, id, recipients } = email;
 
         //add classes
         const element = document.createElement( 'div' );
@@ -116,6 +116,29 @@ function load_mailbox ( mailbox )
 
               const singleEmailContainer = document.querySelector( '#single-email-container' );
 
+              //create the reply button
+              const replyButton = document.createElement( 'button' );
+              replyButton.classList.add( 'btn', 'btn-outline-primary', 'mb-3' );
+              replyButton.textContent = 'Reply';
+              replyButton.addEventListener( 'click', () =>
+              {
+                //go to email composition
+                compose_email();
+
+                // Pre-filling with values from received email                
+                document.querySelector( '#compose-recipients' ).value = `${ sender }`;
+
+                const formatedSubject = subject.startsWith( 'Re:' ) ? `Re: ${ subject }` : `Re: ${ subject }`;
+                document.querySelector( '#compose-subject' ).value = `${ formatedSubject }`;
+
+                //place the cursor on the next paragraph with autofocus
+                const composeBody = document.querySelector( '#compose-body' );
+                composeBody.value = `On ${ timestamp } ${ sender } wrote: ${ body }\n\n`;
+                composeBody.selectionStart = composeBody.selectionEnd = composeBody.value.length;
+                composeBody.focus();
+
+              } );
+
               // Update the innerHTML of the #single-email-container element
               singleEmailContainer.innerHTML = `
                 <div class="card-body">
@@ -128,6 +151,20 @@ function load_mailbox ( mailbox )
                   <p class="card-text">${ body }</p>
                 </div>
               `;
+
+              //add reply button to div with class border-bottom
+              singleEmailContainer.querySelector( '.border-bottom' ).append( replyButton );
+
+              //update read status to false
+              fetch( `/emails/${ id }`, {
+                method: 'PUT',
+                body: JSON.stringify( {
+                  read: true
+                } )
+              } );
+
+
+
 
             } );
         } );
