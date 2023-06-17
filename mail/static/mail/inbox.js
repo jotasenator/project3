@@ -64,5 +64,32 @@ function load_mailbox ( mailbox )
 
   // Show the mailbox name
   document.querySelector( '#emails-view' ).innerHTML = `<h3>${ mailbox.charAt( 0 ).toUpperCase() + mailbox.slice( 1 ) }</h3>`;
-}
 
+  //as many mailbox I have
+  fetch( `/emails/${ mailbox }` )
+    .then( response => response.json() )
+    .then( emails =>
+    {
+      console.table( emails );
+
+      emails.forEach( email =>
+      {
+        console.log( email );
+        const { sender, subject, timestamp } = email;
+        const element = document.createElement( 'div' );
+        element.innerHTML = sender + '/ ' + subject + '/' + timestamp;
+
+        element.addEventListener( 'click', () =>
+        {
+          console.log( 'This element has been clicked!', email.read );
+          email.read = false;
+          console.log( 'This element has been clicked!', email.read );
+
+        } );
+        document.querySelector( '#emails-view' ).append( element );
+
+      } );
+
+    } );
+
+}
